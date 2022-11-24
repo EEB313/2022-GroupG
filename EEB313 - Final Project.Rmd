@@ -5,7 +5,9 @@ output: html_notebook
 ---
 
 ```{r}
+library(dplyr)
 library(tidyverse)
+library(lubridate)
 ```
 
 ```{r}
@@ -14,4 +16,40 @@ head(mingan_flower_data)
 
 mingan_weather_data <- read_csv("mingan_weather_data.csv")
 head(mingan_weather_data)
+```
+
+```{r}
+#make columns with year, month, day
+dmy_weather<-mingan_weather_data %>%
+mutate(date=dmy(date),
+  year=lubridate::year(date),
+  month=lubridate::month(date),
+  day=lubridate::day(date))
+dmy_weather
+```
+
+```{r}
+#make column with average humidity for each month (between April and July) for each year
+avg_weather <- dmy_weather%>%
+  filter(month >= 4 & month <= 7 & !is.na(avg_relative_humidity) & 
+           !is.na(avg_temperature)) %>% 
+  group_by(month, year) %>%
+  summarise(mean_avg_relative_humidity=mean(avg_relative_humidity),
+            mean_avg_temp=mean(avg_temperature))
+avg_weather
+```
+
+```{r}
+#plot average temperature vs. average relative humidity (between April and July)
+avg_weather %>%
+  ggplot(aes(x=mean_avg_temp,y=mean_avg_relative_humidity))+
+  geom_point() + geom_smooth(method = lm) + theme_classic()+
+  labs(title = "Average Temperature vs. Average Relative Humidity 
+       (between April and July)", 
+       x = "Average Temperature", y = "Average Relative Humidity (%)")
+```
+
+```{r}
+# Running a correlation test between average temperature and average relative humidity
+cor.test(avg_weather$mean_avg_relative_humidity, avg_weather$mean_avg_temp)
 ```
