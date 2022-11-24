@@ -1,0 +1,17 @@
+---
+title: "EEB313 - Final Project"
+Authors: "Queenny Chiu, Anna Ly, Derek Lau"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+mingan_flower_data <- read_csv("mingan_flower_data.csv")
+head(mingan_flower_data)
+
+mingan_weather_data <- read_csv("mingan_weather_data.csv")
+head(mingan_weather_data)
+```
