@@ -107,3 +107,15 @@ flower_temp_lm <- lm(day~mean_annual_temp, data=flower_temp_data)
 summary(flower_temp_lm)
 ```
 #p-value = 0.01275 --> Since p-value < 0.05, temperature has a significant effect on first flowering date.
+
+```{r}
+#validate assumptions
+plot(flower_temp_lm, 1:2)
+```
+# Residuals vs. Fitted plot --> homogeneity of variances at each X is met
+# Normal Q-Q --> data is normally distributed
+
+```{r}
+
+```
+
