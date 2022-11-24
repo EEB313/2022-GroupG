@@ -19,6 +19,11 @@ head(mingan_weather_data)
 ```
 
 ```{r}
+#changing the column name "survey_year" into "year"
+colnames(mingan_flower_data)[5] <- "year"
+```
+
+```{r}
 #make columns with year, month, day
 dmy_weather<-mingan_weather_data %>%
 mutate(date=dmy(date),
@@ -52,4 +57,17 @@ avg_weather %>%
 ```{r}
 # Running a correlation test between average temperature and average relative humidity
 cor.test(avg_weather$mean_avg_relative_humidity, avg_weather$mean_avg_temp)
+```
+
+```{r}
+mean_annual_temp <- avg_weather %>% 
+  group_by(year) %>% 
+  summarise(mean_annual_temp = mean(mean_avg_temp))
+mean_annual_temp
+```
+
+```{r}
+#merge the two data into one
+total <- merge(mingan_flower_data, mean_annual_temp, by="year")
+total
 ```
