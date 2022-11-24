@@ -60,6 +60,15 @@ cor.test(avg_weather$mean_avg_relative_humidity, avg_weather$mean_avg_temp)
 ```
 
 ```{r}
+# find average temperature per year
+mean_annual_temp <- avg_weather %>% 
+  group_by(year) %>% 
+  summarise(mean_annual_temp = mean(mean_avg_temp))
+
+mean_annual_temp
+```
+
+```{r}
 mean_annual_temp <- avg_weather %>% 
   group_by(year) %>% 
   summarise(mean_annual_temp = mean(mean_avg_temp))
@@ -71,3 +80,30 @@ mean_annual_temp
 total <- merge(mingan_flower_data, mean_annual_temp, by="year")
 total
 ```
+
+```{r}
+#filter out NAs
+flower_temp_data <- total %>% 
+  filter(!is.na(day))
+
+flower_temp_data
+```
+
+```{r}
+# create graph of temperature (x) vs. flowering day (y)
+
+flower_temp_data %>% 
+  group_by(mean_annual_temp, species_name) %>% 
+  ggplot(aes(x = mean_annual_temp, y = day, colour = species_name)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_classic()
+
+```
+```{r}
+#create linear model (x = temperature, y = flowering day)
+
+flower_temp_lm <- lm(day~mean_annual_temp, data=flower_temp_data)
+summary(flower_temp_lm)
+```
+#p-value = 0.01275 --> Since p-value < 0.05, temperature has a significant effect on first flowering date.
