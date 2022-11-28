@@ -136,6 +136,10 @@ flower_temp_data %>%
 flower_temp_lm2 <- lmer(day ~ mean_annual_temp + (1|species_name), data = flower_temp_data, REML = FALSE)       
 summary(flower_temp_lm2)
 ```
+# (variance of species / total variance)*100 = (334.05/(334.05+35.48))*100 = 90.39861%
+#The different species account for 90.39861% of residual variance in the model.
+
+
 ```{r}
 # create graph of temperature (x) vs. flowering day (y) by species using actual data
 
@@ -198,5 +202,34 @@ anova(Levene.flower_temp_lm_2) #displays the results
 #Since the p-value is greater than 0.05, the assumption of homogeneity of variance is met.
 
 ```{r}
+#assumption 3 - normal distribution
 qqmath(flower_temp_lm2)
 ```
+#Overall, the line looks straight, which suggests that the assumption of normality is not violated.
+
+```{r}
+# create mixed effect model (temperature vs flowering date + station (random effect))
+
+flower_temp_lm3 <- lmer(day ~ mean_annual_temp + (1|species_name) + (1|island/station_name), data = flower_temp_data, REML = FALSE)       
+summary(flower_temp_lm3)
+
+#ASK TA
+#basic
+#+species
+#+island/station (or only station)
+#+species + island/station (or only station)
+```
+```{r}
+# create graph of temperature (x) vs. flowering day (y) by stations using actual data
+
+flower_temp_data %>% 
+  group_by(mean_annual_temp, island, species_name) %>% 
+  ggplot(aes(x = mean_annual_temp, y = day, colour = island)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_classic() +
+  facet_wrap(~species_name)
+  labs(title = "First Flowering Date vs. Temperature (by Island)", x = "Mean Annual Temperature (Degrees Celsius)", y = "First Flowering Date (Actual Data)" )
+```
+```
+
