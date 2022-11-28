@@ -8,6 +8,8 @@ output: html_notebook
 library(dplyr)
 library(tidyverse)
 library(lubridate)
+library(lme4)
+library(lmerTest)
 ```
 
 ```{r}
