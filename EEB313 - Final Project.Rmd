@@ -8,8 +8,8 @@ output: html_notebook
 library(dplyr)
 library(tidyverse)
 library(lubridate)
-library(lme4)
 library(lmerTest)
+library(lme4)
 ```
 
 ```{r}
@@ -91,19 +91,9 @@ flower_temp_data <- total %>%
 flower_temp_data
 ```
 
-```{r}
-# create graph of temperature (x) vs. flowering day (y) by species
 
-flower_temp_data %>% 
-  group_by(mean_annual_temp, species_name) %>% 
-  ggplot(aes(x = mean_annual_temp, y = day, colour = species_name)) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  theme_classic()
-
-```
 ```{r}
-#create linear model (x = temperature, y = flowering day)
+#create linear model 1 (x = temperature, y = flowering day)
 
 flower_temp_lm <- lm(day~mean_annual_temp, data=flower_temp_data)
 summary(flower_temp_lm)
@@ -140,6 +130,69 @@ flower_temp_data %>%
 ```
 
 ```{r}
+# create mixed effect model (temperature vs flowering date + species (random effect))
+
 flower_temp_lm2 <- lmer(day ~ mean_annual_temp + (1|species_name), data = flower_temp_data, REML = FALSE)       
 summary(flower_temp_lm2)
 ```
+```{r}
+# create graph of temperature (x) vs. flowering day (y) by species using actual data
+
+flower_temp_data %>% 
+  group_by(mean_annual_temp, species_name) %>% 
+  ggplot(aes(x = mean_annual_temp, y = day, colour = species_name)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_classic() +
+  labs(title = "First Flowering Date vs. Temperature (by Species)", x = "Mean Annual Temperature (Degrees Celsius)", y = "First Flowering Date (Actual Data)" )
+```
+
+
+```{r}
+#create graph of temperature (x) vs. flowering day (y) by species using predicted data
+flower_temp_data <- flower_temp_data %>% 
+  mutate(flowering_date_pred_spec = predict(flower_temp_lm2)) #add predicted values to dataset
+
+flower_temp_data %>% 
+  ggplot(aes(x = mean_annual_temp, y = day, colour = species_name)) +
+  theme_classic() +
+  labs(title = "First Flowering Date vs. Temperature", x = "Mean Annual Temperature (Degrees Celsius)", y = "First Flowering Date (Predicted Data)" ) +
+  
+#Add fixed effect regression line (from model output above)
+  geom_abline(aes(intercept=174.7261, slope=-2.6379), size=2) +
+
+
+#Add fitted values (i.e., regression lines)
+  geom_line(aes(y = flowering_date_pred_spec), size = 1) +
+  geom_point(size = 1.2)
+```
+#The thick black line corresponds to the fitted values associated with the fixed-effect component of the model. The thin coloured lines correspond to the fitted values estimated for each species.
+
+
+```{r}
+#check assumptions
+
+#assumption 1 - linearity
+flower_temp_lm2_linearity <- plot(resid(flower_temp_lm2))
+```
+# looks random, so we have not violated the assumption of linearity (https://ademos.people.uic.edu/Chapter18.html)
+
+```{r}
+#assumption 2 - homogeneity of variance
+
+#extract the residuals and places them in a new column in our original data table
+flower_temp_data$flower_temp_lm2.Res <- residuals(flower_temp_lm2) 
+
+#create a new column with the absolute value of the residuals
+flower_temp_data$flower_temp_lm2.Res <- abs(flower_temp_data$flower_temp_lm2.Res)
+
+#square the absolute values of the residuals to provide the more robust estimate
+flower_temp_data$flower_temp_lm2.Res2 <- flower_temp_data$flower_temp_lm2.Res^2
+
+#ANOVA of the squared residuals
+Levene.flower_temp_lm_2 <- lm(flower_temp_lm2.Res2 ~ species_name, data = flower_temp_data)
+
+anova(Levene.flower_temp_lm_2) #displays the results
+```
+#Since the p-value is greater than 0.05, the assumption of homogeneity of variance is met.
+
