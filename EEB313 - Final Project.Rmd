@@ -10,6 +10,7 @@ library(tidyverse)
 library(lubridate)
 library(lmerTest)
 library(lme4)
+library(lattice)
 ```
 
 ```{r}
@@ -196,3 +197,6 @@ anova(Levene.flower_temp_lm_2) #displays the results
 ```
 #Since the p-value is greater than 0.05, the assumption of homogeneity of variance is met.
 
+```{r}
+qqmath(flower_temp_lm2)
+```
