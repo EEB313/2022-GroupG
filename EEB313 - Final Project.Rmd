@@ -90,7 +90,7 @@ flower_temp_data
 ```
 
 ```{r}
-# create graph of temperature (x) vs. flowering day (y)
+# create graph of temperature (x) vs. flowering day (y) by species
 
 flower_temp_data %>% 
   group_by(mean_annual_temp, species_name) %>% 
@@ -116,6 +116,24 @@ plot(flower_temp_lm, 1:2)
 # Normal Q-Q --> data is normally distributed
 
 ```{r}
+#first flowering date vs. temperature based on actual data
+flower_temp_data %>% 
+  ggplot(aes(x = mean_annual_temp, y = day)) +
+  geom_smooth(method = "lm")+
+  theme_classic() +
+  labs(title = "First Flowering Date vs. Temperature", x = "Mean Annual Temperature (Degrees Celsius)", y = "First Flowering Date (Actual Data)" )
+
+```
+
+```{r}
+#predicted values of first flowering date by temperature based on linear model
+flower_temp_data %>% 
+  mutate(flowering_date_pred = predict(flower_temp_lm)) %>% #include predicted values to dataset
+  ggplot(aes(x = mean_annual_temp, y = day)) +
+  geom_line(aes(y = flowering_date_pred)) +
+  theme_classic() +
+  labs(title = "First Flowering Date vs. Temperature", x = "Mean Annual Temperature (Degrees Celsius)", y = "First Flowering Date (Predicted Data)" )
+  
 
 ```
 
