@@ -137,3 +137,7 @@ flower_temp_data %>%
 
 ```
 
+```{r}
+flower_temp_lm2 <- lmer(day ~ mean_annual_temp + (1|species_name), data = flower_temp_data, REML = FALSE)       
+summary(flower_temp_lm2)
+```
