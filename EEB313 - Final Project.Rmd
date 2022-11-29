@@ -161,10 +161,31 @@ summary(lm3)
 plot(lm3, 1:2)
 ```
 
+# RANDOM EFFECT A: (1|station_name)
+
+```{r}
+#Model 1.a (flowering date vs. temperature + stations (RANDOM EFFECT))
+
+lm1.a <- lmer(day ~ mean_annual_temp + (1|station_name), data = flower_temp_data, REML = FALSE)   
+summary(lm1.a)
+```
+
+```{r}
+#Model 2.a (flowering date vs. species + stations (RANDOM EFFECT))
+
+lm2.a <- lmer(day ~ species_name + (1|station_name), data = flower_temp_data, REML = FALSE)   
+summary(lm2.a)
+```
+
+```{r}
+#Model 3.a (flowering date vs. temperature*species + stations (RANDOM EFFECT))
+
+lm3.a <- lmer(day ~ mean_annual_temp*species_name + (1|station_name), data = flower_temp_data, REML = FALSE)   
+summary(lm3.a)
+```
 
 
-
-# RANDOM EFFECT B: + (1|island)
+# RANDOM EFFECT B: (1|island)
 ```{r}
 #Model 1.b (flowering date vs.  temperature + islands (RANDOM EFFECT))
 lm1.b <- lmer(day~mean_annual_temp + (1|island), data=flower_temp_data)
@@ -183,6 +204,33 @@ summary(lm2.b)
 lm3.b <- lmer(day~mean_a * species_name + (1|island), data=flower_temp_data)
 summary(lm3.b)
 ```
+
+# RANDOM EFFECT C: (1|island/station_name)
+
+```{r}
+#Model 1.c (flowering date vs. temperature + (1|island/station_name) (RANDOM EFFECT))
+
+lm1.c <- lmer(day ~ mean_annual_temp + (1|island/station_name), data = flower_temp_data, REML = FALSE)   
+summary(lm1.c)
+```
+
+```{r}
+#Model 2.c (flowering date vs. species + (1|island/station_name) (RANDOM EFFECT))
+
+lm2.c <- lmer(day ~ species_name + (1|island/station_name), data = flower_temp_data, REML = FALSE)   
+summary(lm2.c)
+```
+
+```{r}
+#Model 3.c (flowering date vs. temperature*species + (1|island/station_name) (RANDOM EFFECT))
+
+lm3.c <- lmer(day ~ mean_annual_temp*species_name + (1|island/station_name), data = flower_temp_data, REML = FALSE)   
+summary(lm3.c)
+```
+
+
+
+
 
 
 
