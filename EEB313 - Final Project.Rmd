@@ -10,6 +10,7 @@ library(tidyverse)
 library(lubridate)
 library(lmerTest)
 library(lme4)
+library(MuMIn)
 ```
 
 ```{r}
@@ -160,6 +161,28 @@ summary(lm3)
 plot(lm3, 1:2)
 ```
 
+
+
+
+# RANDOM EFFECT B: + (1|island)
+```{r}
+#Model 1.b (flowering date vs.  temperature + islands (RANDOM EFFECT))
+lm1.b <- lmer(day~mean_annual_temp + (1|island), data=flower_temp_data)
+summary(lm1.b)
+
+```
+
+```{r}
+#Model 2.b (flowering date vs. species + islands (RANDOM EFFECT))
+lm2.b <- lmer(day~species_name + (1|island), data=flower_temp_data)
+summary(lm2.b)
+```
+
+```{r}
+#Model 3.b (flowering date vs.  temperature *species + islands (RANDOM EFFECT))
+lm3.b <- lmer(day~mean_a * species_name + (1|island), data=flower_temp_data)
+summary(lm3.b)
+```
 
 
 
