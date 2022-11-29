@@ -10,7 +10,6 @@ library(tidyverse)
 library(lubridate)
 library(lmerTest)
 library(lme4)
-library(lattice)
 ```
 
 ```{r}
@@ -92,22 +91,6 @@ flower_temp_data <- total %>%
 flower_temp_data
 ```
 
-
-```{r}
-#create linear model 1 (x = temperature, y = flowering day)
-
-flower_temp_lm <- lm(day~mean_annual_temp, data=flower_temp_data)
-summary(flower_temp_lm)
-```
-#p-value = 0.01275 --> Since p-value < 0.05, temperature has a significant effect on first flowering date.
-
-```{r}
-#validate assumptions
-plot(flower_temp_lm, 1:2)
-```
-# Residuals vs. Fitted plot --> homogeneity of variances at each X is met
-# Normal Q-Q --> data is normally distributed
-
 ```{r}
 #first flowering date vs. temperature based on actual data
 flower_temp_data %>% 
@@ -115,20 +98,40 @@ flower_temp_data %>%
   geom_smooth(method = "lm")+
   theme_classic() +
   labs(title = "First Flowering Date vs. Temperature", x = "Mean Annual Temperature (Degrees Celsius)", y = "First Flowering Date (Actual Data)" )
-
 ```
 
 ```{r}
-#predicted values of first flowering date by temperature based on linear model
-flower_temp_data %>% 
-  mutate(flowering_date_pred = predict(flower_temp_lm)) %>% #include predicted values to dataset
-  ggplot(aes(x = mean_annual_temp, y = day)) +
-  geom_line(aes(y = flowering_date_pred)) +
-  theme_classic() +
-  labs(title = "First Flowering Date vs. Temperature", x = "Mean Annual Temperature (Degrees Celsius)", y = "First Flowering Date (Predicted Data)" )
-  
+#Model 1 (y = flowering day, x = temperature)
+flower_temp_lm1 <- lm(day~mean_annual_temp, data=flower_temp_data)
+summary(flower_temp_lm1)
+```
+#p-value = 0.01275 --> Since p-value < 0.05, temperature has a significant effect on first flowering date.
+
+```{r}
+#Model 1: validate assumptions
+plot(flower_temp_lm1, 1:2)
+```
+# Residuals vs. Fitted plot --> homogeneity of variances at each X is met
+# Normal Q-Q --> data is normally distributed
+
+
+```{r}
+#Model 2 (y = flowering day, x = species)
+flower_temp_lm1 <- lm(day~mean_annual_temp, data=flower_temp_data)
+summary(flower_temp_lm1)
 
 ```
+
+
+
+
+
+
+
+
+
+
+
 
 ```{r}
 # create mixed effect model (temperature vs flowering date + species (random effect))
@@ -136,6 +139,8 @@ flower_temp_data %>%
 flower_temp_lm2 <- lmer(day ~ mean_annual_temp + (1|species_name), data = flower_temp_data, REML = FALSE)       
 summary(flower_temp_lm2)
 ```
+
+
 # (variance of species / total variance)*100 = (334.05/(334.05+35.48))*100 = 90.39861%
 #The different species account for 90.39861% of residual variance in the model.
 
@@ -175,52 +180,23 @@ flower_temp_data %>%
 
 
 ```{r}
-#check assumptions
-
-#assumption 1 - linearity
-flower_temp_lm2_linearity <- plot(resid(flower_temp_lm2))
-```
-# looks random, so we have not violated the assumption of linearity (https://ademos.people.uic.edu/Chapter18.html)
-
-```{r}
-#assumption 2 - homogeneity of variance
-
-#extract the residuals and places them in a new column in our original data table
-flower_temp_data$flower_temp_lm2.Res <- residuals(flower_temp_lm2) 
-
-#create a new column with the absolute value of the residuals
-flower_temp_data$flower_temp_lm2.Res <- abs(flower_temp_data$flower_temp_lm2.Res)
-
-#square the absolute values of the residuals to provide the more robust estimate
-flower_temp_data$flower_temp_lm2.Res2 <- flower_temp_data$flower_temp_lm2.Res^2
-
-#ANOVA of the squared residuals
-Levene.flower_temp_lm_2 <- lm(flower_temp_lm2.Res2 ~ species_name, data = flower_temp_data)
-
-anova(Levene.flower_temp_lm_2) #displays the results
-```
-#Since the p-value is greater than 0.05, the assumption of homogeneity of variance is met.
-
-```{r}
-#assumption 3 - normal distribution
-qqmath(flower_temp_lm2)
-```
-#Overall, the line looks straight, which suggests that the assumption of normality is not violated.
-
-```{r}
 # create mixed effect model (temperature vs flowering date + station (random effect))
 
-flower_temp_lm3 <- lmer(day ~ mean_annual_temp + (1|species_name) + (1|island/station_name), data = flower_temp_data, REML = FALSE)       
+flower_temp_lm3 <- lmer(day ~ mean_annual_temp + (1|island/station_name), data = flower_temp_data, REML = FALSE)       
 summary(flower_temp_lm3)
 
 #ASK TA
-#basic
+#basic (flower date vs. temperature)
+
+#random effects:
 #+species
 #+island/station (or only station)
 #+species + island/station (or only station)
 ```
+
+
 ```{r}
-# create graph of temperature (x) vs. flowering day (y) by stations using actual data
+# create graph of temperature (x) vs. flowering day (y) by island (??) using actual data
 
 flower_temp_data %>% 
   group_by(mean_annual_temp, island, species_name) %>% 
@@ -231,5 +207,12 @@ flower_temp_data %>%
   facet_wrap(~species_name)
   labs(title = "First Flowering Date vs. Temperature (by Island)", x = "Mean Annual Temperature (Degrees Celsius)", y = "First Flowering Date (Actual Data)" )
 ```
+
+
+```{r}
+# create mixed effect model (temperature vs flowering date + species + station (random effects))
+
+flower_temp_lm4 <- lmer(day ~ mean_annual_temp + (1|species_name) + (1|island/station_name), data = flower_temp_data, REML = FALSE)       
+summary(flower_temp_lm4)
 ```
 
