@@ -228,6 +228,7 @@ lm3.c <- lmer(day ~ mean_annual_temp*species_name + (1|island/station_name), dat
 summary(lm3.c)
 ```
 
+# run AICc
 ```{r}
 result <- AICc(lm1, lm2, lm3, lm1.a, lm1.b, lm1.c, lm2.a, lm2.b, lm2.c, lm3.a, lm3.b, lm3.c)
 result
