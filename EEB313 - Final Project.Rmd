@@ -201,7 +201,7 @@ summary(lm2.b)
 
 ```{r}
 #Model 3.b (flowering date vs.  temperature *species + islands (RANDOM EFFECT))
-lm3.b <- lmer(day~mean_a * species_name + (1|island), data=flower_temp_data)
+lm3.b <- lmer(day~mean_annul_temp * species_name + (1|island), data=flower_temp_data)
 summary(lm3.b)
 ```
 
