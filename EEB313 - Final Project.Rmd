@@ -184,7 +184,6 @@ lm3.a <- lmer(day ~ mean_annual_temp*species_name + (1|station_name), data = flo
 summary(lm3.a)
 ```
 
-
 # RANDOM EFFECT B: (1|island)
 ```{r}
 #Model 1.b (flowering date vs.  temperature + islands (RANDOM EFFECT))
@@ -201,10 +200,9 @@ summary(lm2.b)
 
 ```{r}
 #Model 3.b (flowering date vs.  temperature *species + islands (RANDOM EFFECT))
-lm3.b <- lmer(day~mean_annul_temp * species_name + (1|island), data=flower_temp_data)
+lm3.b <- lmer(day~mean_annual_temp * species_name + (1|island), data=flower_temp_data)
 summary(lm3.b)
 ```
-
 # RANDOM EFFECT C: (1|island/station_name)
 
 ```{r}
@@ -228,7 +226,7 @@ lm3.c <- lmer(day ~ mean_annual_temp*species_name + (1|island/station_name), dat
 summary(lm3.c)
 ```
 
-# run AICc
+#run AICc
 ```{r}
 result <- AICc(lm1, lm2, lm3, lm1.a, lm1.b, lm1.c, lm2.a, lm2.b, lm2.c, lm3.a, lm3.b, lm3.c)
 result
@@ -238,82 +236,32 @@ result
 result[which.min(result$AICc),]
 ```
 
-
-
-
-
-
+#lm3.b is the best model.
 
 ```{r}
-# create mixed effect model (temperature vs flowering date + species (random effect))
+#create a model for lm3.b (flowering date vs.  temperature*species + islands (RANDOM EFFECT))
+flower_temp_data <- flower_temp_data %>% 
+  mutate(lm3.b.pred = predict(lm3.b)) #add predicted values to dataset
 
-flower_temp_lm2 <- lmer(day ~ mean_annual_temp + (1|species_name), data = flower_temp_data, REML = FALSE)       
-summary(flower_temp_lm2)
+lm3.b.fig <- flower_temp_data %>% 
+  ggplot(aes(x = mean_annual_temp, y = day, colour = species_name)) +
+  theme_classic() +
+  facet_wrap(~island) +
+  labs(x = "Mean Annual Temperature (Degrees Celsius)", y = "First Flowering Date (Predicted Data)", colour = "Species" ) +
+  
+#Add fitted values (i.e., regression lines)
+  geom_line(aes(y = lm3.b.pred), size = 1) +
+  geom_point(size = 1.2, alpha = 0.5)
+
+lm3.b.fig
 ```
+```
+
+
+
 
 
 # (variance of species / total variance)*100 = (334.05/(334.05+35.48))*100 = 90.39861%
 #The different species account for 90.39861% of residual variance in the model.
 
-
-
-
-
-```{r}
-#create graph of temperature (x) vs. flowering day (y) by species using predicted data
-flower_temp_data <- flower_temp_data %>% 
-  mutate(flowering_date_pred_spec = predict(flower_temp_lm2)) #add predicted values to dataset
-
-flower_temp_data %>% 
-  ggplot(aes(x = mean_annual_temp, y = day, colour = species_name)) +
-  theme_classic() +
-  labs(title = "First Flowering Date vs. Temperature", x = "Mean Annual Temperature (Degrees Celsius)", y = "First Flowering Date (Predicted Data)" ) +
-  
-#Add fixed effect regression line (from model output above)
-  geom_abline(aes(intercept=174.7261, slope=-2.6379), size=2) +
-
-
-#Add fitted values (i.e., regression lines)
-  geom_line(aes(y = flowering_date_pred_spec), size = 1) +
-  geom_point(size = 1.2)
-```
-#The thick black line corresponds to the fitted values associated with the fixed-effect component of the model. The thin coloured lines correspond to the fitted values estimated for each species.
-
-
-```{r}
-# create mixed effect model (temperature vs flowering date + station (random effect))
-
-flower_temp_lm3 <- lmer(day ~ mean_annual_temp + (1|island/station_name), data = flower_temp_data, REML = FALSE)       
-summary(flower_temp_lm3)
-
-#ASK TA
-#basic (flower date vs. temperature)
-
-#random effects:
-#+species
-#+island/station (or only station)
-#+species + island/station (or only station)
-```
-
-
-```{r}
-# create graph of temperature (x) vs. flowering day (y) by island (??) using actual data
-
-flower_temp_data %>% 
-  group_by(mean_annual_temp, island, species_name) %>% 
-  ggplot(aes(x = mean_annual_temp, y = day, colour = island)) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  theme_classic() +
-  facet_wrap(~species_name)
-  labs(title = "First Flowering Date vs. Temperature (by Island)", x = "Mean Annual Temperature (Degrees Celsius)", y = "First Flowering Date (Actual Data)" )
-```
-
-
-```{r}
-# create mixed effect model (temperature vs flowering date + species + station (random effects))
-
-flower_temp_lm4 <- lmer(day ~ mean_annual_temp + (1|species_name) + (1|island/station_name), data = flower_temp_data, REML = FALSE)       
-summary(flower_temp_lm4)
-```
 
