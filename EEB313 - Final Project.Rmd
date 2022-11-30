@@ -55,10 +55,27 @@ temp_humidity <- ggscatter(avg_weather, x = "mean_avg_temp", y = "mean_avg_relat
           xlab = "Average Temperature", ylab = "Average Relative Humidity (%)")
 temp_humidity
 ```
+```{r}
+#validate assumptions for correlation test
+
+#1 - linearity --> linearity is shown in the plot above
+
+#2 - normality (Shapiro-Wilk Test and qqplot)
+#temperature
+shapiro.test(avg_weather$mean_avg_temp) 
+ggqqplot(avg_weather$mean_avg_temp, ylab = "Average Temperature")
+#temperature p-value < 0.05, so normality assumption is invalid --> use Spearman or Kendall
+
+#humidity
+shapiro.test(avg_weather$mean_avg_relative_humidity)
+ggqqplot(avg_weather$mean_avg_relative_humidity, ylab = "Average Relative Humidity")
+```
 
 ```{r}
 # Running a correlation test between average temperature and average relative humidity
-cor.test(avg_weather$mean_avg_relative_humidity, avg_weather$mean_avg_temp)
+cor.test(avg_weather$mean_avg_relative_humidity, avg_weather$mean_avg_temp, method = "spearman")
+#Spearman cannot compute exact p-value with ties, so use kendall
+cor.test(avg_weather$mean_avg_relative_humidity, avg_weather$mean_avg_temp, method = "kendall")
 ```
 
 ```{r}
