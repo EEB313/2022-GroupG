@@ -11,6 +11,7 @@ library(lubridate)
 library(lmerTest)
 library(lme4)
 library(MuMIn)
+library(ggpubr)
 ```
 
 ```{r}
@@ -49,12 +50,10 @@ avg_weather
 
 ```{r}
 #plot average temperature vs. average relative humidity (between April and July)
-avg_weather %>%
-  ggplot(aes(x=mean_avg_temp,y=mean_avg_relative_humidity))+
-  geom_point() + geom_smooth(method = lm) + theme_classic()+
-  labs(title = "Average Temperature vs. Average Relative Humidity 
-       (between April and July)", 
-       x = "Average Temperature", y = "Average Relative Humidity (%)")
+temp_humidity <- ggscatter(avg_weather, x = "mean_avg_temp", y = "mean_avg_relative_humidity", add = "reg.line", conf.int = TRUE, cor.coef = TRUE,
+          cor.method = "kendall",
+          xlab = "Average Temperature", ylab = "Average Relative Humidity (%)")
+temp_humidity
 ```
 
 ```{r}
