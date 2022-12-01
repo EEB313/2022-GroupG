@@ -1,7 +1,9 @@
 ---
 title: "EEB313 - Final Project"
-Authors: "Queenny Chiu, Anna Ly, Derek Lau"
-output: html_notebook
+Authors: Queenny Chiu, Anna Ly, Derek Lau
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 ```{r}
@@ -50,26 +52,30 @@ avg_weather
 
 ```{r}
 #plot average temperature vs. average relative humidity (between April and July)
-temp_humidity <- ggscatter(avg_weather, x = "mean_avg_temp", y = "mean_avg_relative_humidity", add = "reg.line", conf.int = TRUE, cor.coef = TRUE,
-          cor.method = "kendall",
-          xlab = "Average Temperature", ylab = "Average Relative Humidity (%)")
+temp_humidity <- ggscatter(avg_weather, x = "mean_avg_temp", y = "mean_avg_relative_humidity", 
+                           add = "reg.line", conf.int = TRUE, 
+                           cor.method = "kendall",
+          xlab = "Average Temperature (Degrees Celsius)", ylab = "Average Relative Humidity (%)")
 temp_humidity
 ```
+
+
 ```{r}
 #validate assumptions for correlation test
 
 #1 - linearity --> linearity is shown in the plot above
 
 #2 - normality (Shapiro-Wilk Test and qqplot)
-#temperature
+#temperature normality
 shapiro.test(avg_weather$mean_avg_temp) 
 ggqqplot(avg_weather$mean_avg_temp, ylab = "Average Temperature")
 #temperature p-value < 0.05, so normality assumption is invalid --> use Spearman or Kendall
 
-#humidity
+#humidity normality
 shapiro.test(avg_weather$mean_avg_relative_humidity)
 ggqqplot(avg_weather$mean_avg_relative_humidity, ylab = "Average Relative Humidity")
 ```
+
 
 ```{r}
 # Running a correlation test between average temperature and average relative humidity
@@ -77,6 +83,10 @@ cor.test(avg_weather$mean_avg_relative_humidity, avg_weather$mean_avg_temp, meth
 #Spearman cannot compute exact p-value with ties, so use kendall
 cor.test(avg_weather$mean_avg_relative_humidity, avg_weather$mean_avg_temp, method = "kendall")
 ```
+
+
+
+
 
 ```{r}
 # find average temperature per year
@@ -113,6 +123,7 @@ flower_temp_data
 flower_temp_data %>% 
   ggplot(aes(x = mean_annual_temp, y = day)) +
   geom_smooth(method = "lm")+
+  geom_point()+
   theme_classic() +
   labs(title = "First Flowering Date vs. Temperature", x = "Mean Annual Temperature (Degrees Celsius)", y = "First Flowering Date (Actual Data)" )
 ```
@@ -263,7 +274,9 @@ lm3.b.fig <- flower_temp_data %>%
   ggplot(aes(x = mean_annual_temp, y = day, colour = species_name)) +
   theme_classic() +
   facet_wrap(~island) +
-  labs(x = "Mean Annual Temperature (Degrees Celsius)", y = "First Flowering Date (Predicted Data)", colour = "Species" ) +
+  labs(x = "Mean Annual Temperature (Degrees Celsius)", 
+       y = "First Flowering Date (Predicted Data)", 
+       colour = "Species" ) +
   
 #Add fitted values (i.e., regression lines)
   geom_line(aes(y = lm3.b.pred), size = 1) +
@@ -274,10 +287,5 @@ lm3.b.fig
 ```
 
 
-
-
-
-# (variance of species / total variance)*100 = (334.05/(334.05+35.48))*100 = 90.39861%
-#The different species account for 90.39861% of residual variance in the model.
 
 
