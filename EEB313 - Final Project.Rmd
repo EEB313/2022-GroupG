@@ -17,6 +17,7 @@ library(ggpubr)
 ```
 
 ```{r}
+#import data from the csv.
 mingan_flower_data <- read_csv("mingan_flower_data.csv")
 head(mingan_flower_data)
 
@@ -84,23 +85,12 @@ cor.test(avg_weather$mean_avg_relative_humidity, avg_weather$mean_avg_temp, meth
 cor.test(avg_weather$mean_avg_relative_humidity, avg_weather$mean_avg_temp, method = "kendall")
 ```
 
-
-
-
-
 ```{r}
 # find average temperature per year
 mean_annual_temp <- avg_weather %>% 
   group_by(year) %>% 
   summarise(mean_annual_temp = mean(mean_avg_temp))
-
-mean_annual_temp
-```
-
-```{r}
-mean_annual_temp <- avg_weather %>% 
-  group_by(year) %>% 
-  summarise(mean_annual_temp = mean(mean_avg_temp))
+  
 mean_annual_temp
 ```
 
@@ -119,7 +109,7 @@ flower_temp_data
 ```
 
 ```{r}
-#Model 1: first flowering date vs. temperature based on actual data
+#Model 1: first flowering date vs. temperature based on actual data (graph)
 flower_temp_data %>% 
   ggplot(aes(x = mean_annual_temp, y = day)) +
   geom_smooth(method = "lm")+
@@ -143,7 +133,7 @@ plot(lm1, 1:2)
 # Normal Q-Q --> data is normally distributed
 
 ```{r}
-#Model 2: first flowering date vs. species based on actual data
+#Model 2: first flowering date vs. species based on actual data (graph)
 flower_temp_data %>% 
   ggplot(aes(x = species_name, y = day, fill = species_name)) +
   geom_boxplot()+
@@ -267,7 +257,7 @@ result[which.min(result$AICc),]
 #lm3.b is the best model.
 
 ```{r}
-#create a model for lm3.b (flowering date vs.  temperature*species + islands (RANDOM EFFECT))
+#create a graph for lm3.b (flowering date vs.  temperature*species + islands (RANDOM EFFECT))
 flower_temp_data <- flower_temp_data %>% 
   mutate(lm3.b.pred = predict(lm3.b)) #add predicted values to dataset
 
@@ -284,7 +274,6 @@ lm3.b.fig <- flower_temp_data %>%
   geom_point(size = 1.2, alpha = 0.5)
 
 lm3.b.fig
-```
 ```
 
 
