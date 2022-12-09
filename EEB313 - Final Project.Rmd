@@ -55,7 +55,7 @@ avg_weather
 temp_humidity <- ggscatter(avg_weather, x = "mean_avg_temp", y = "mean_avg_relative_humidity", 
                            add = "reg.line", conf.int = TRUE, 
                            cor.method = "kendall",
-          xlab = "Average Temperature (Degrees Celsius)", ylab = "Average Relative Humidity (%)")
+          xlab = "Average Monthly Temperature (April - July) (Degrees Celsius)", ylab = "Average Relative Humidity (%)")
 temp_humidity
 ```
 
@@ -148,6 +148,7 @@ flower_temp_data %>%
   ggplot(aes(x = species_name, y = day, fill = species_name)) +
   geom_boxplot()+
   theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
   labs(title = "First Flowering Date vs. Species", x = "Species", y = "First Flowering Date (Actual Data)" )
 ```
 
