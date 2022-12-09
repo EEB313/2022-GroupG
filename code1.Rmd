@@ -1,8 +1,0 @@
----
-title: "First ggplot"
-author: "AL"
----
-
-Hello! This is our first plot!
-
----{r}
